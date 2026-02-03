@@ -2,32 +2,25 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>G1 Agent - Mortgage Assistant</title>
-
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" />
+    <title>G1 Mortgage Assistant Widget</title>
+    <meta name="robots" content="noindex, nofollow" />
 
     <style>
       :root {
         --bg-primary: #FFFFFF;
-        --bg-secondary: #F9FAFB;
-        --bg-user: #2E3440;
-        --bg-assistant: #F5F5F5;
+        --bg-assistant: #1F2937;
+        --bg-user: #DBEAFE;
         --text-primary: #111827;
         --text-secondary: #6B7280;
         --text-inverse: #FFFFFF;
         --border: #E5E7EB;
         --accent: #3B82F6;
-        --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
-        --shadow: 0 1px 3px rgba(0,0,0,0.1);
-        --shadow-md: 0 4px 6px rgba(0,0,0,0.07);
-        --radius-sm: 8px;
+        --send-btn: #9CA3AF;
+        --send-btn-hover: #3B82F6;
+        --radius-sm: 6px;
         --radius-md: 12px;
         --radius-lg: 16px;
-        --radius-full: 9999px;
       }
 
       * {
@@ -38,229 +31,133 @@
 
       html, body {
         height: 100%;
+        overflow: hidden;
       }
 
       body {
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-        font-size: 14px;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        font-size: 15px;
         color: var(--text-primary);
         background: var(--bg-primary);
         line-height: 1.5;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
       }
 
-      /* App Layout */
-      .app {
+      /* ── Widget Shell ── */
+      .chat-widget {
+        display: flex;
+        flex-direction: column;
         height: 100dvh;
-        display: flex;
-        flex-direction: column;
-      }
-
-      /* Header */
-      .header {
-        height: 48px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 0 16px;
-        border-bottom: 1px solid var(--border);
+        height: 100vh;
+        width: 100%;
         background: var(--bg-primary);
-        flex-shrink: 0;
+        position: relative;
       }
 
-      .logo {
-        font-family: 'Space Grotesk', sans-serif;
-        font-weight: 700;
-        font-size: 15px;
-        letter-spacing: -0.02em;
-        color: var(--text-primary);
-      }
-
-      .header-right {
-        font-size: 11px;
-        color: var(--text-secondary);
-        letter-spacing: 0.02em;
-      }
-
-      /* Main Chat Area */
-      .main {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-        background: var(--bg-primary);
-      }
-
-      .chat-container {
+      /* ── Messages Container ── */
+      .messages-container {
         flex: 1;
         overflow-y: auto;
+        overflow-x: hidden;
+        padding: 16px 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
+      }
+
+      .messages-container::-webkit-scrollbar {
+        width: 4px;
+      }
+
+      .messages-container::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      .messages-container::-webkit-scrollbar-thumb {
+        background: var(--border);
+        border-radius: 4px;
+      }
+
+      /* ── Welcome Message ── */
+      .welcome-prompt {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        flex: 1;
         padding: 24px 16px;
-      }
-
-      .chat-inner {
-        max-width: 768px;
-        margin: 0 auto;
-        width: 100%;
-      }
-
-      /* Welcome State */
-      .welcome {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        min-height: 60vh;
-        padding: 32px 16px;
         text-align: center;
+        min-height: 200px;
+        opacity: 1;
+        transition: opacity 0.3s ease;
       }
 
-      .welcome-icon {
-        width: 56px;
-        height: 56px;
-        background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
-        border-radius: var(--radius-lg);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 24px;
-        box-shadow: var(--shadow-md);
-      }
-
-      .welcome-icon svg {
-        width: 28px;
-        height: 28px;
-        color: white;
-      }
-
-      .welcome-title {
-        font-size: 28px;
-        font-weight: 600;
-        color: var(--text-primary);
-        margin-bottom: 8px;
-        line-height: 1.2;
-      }
-
-      .welcome-subtitle {
-        font-size: 15px;
-        color: var(--text-secondary);
-        margin-bottom: 32px;
-      }
-
-      /* Quick Action Cards */
-      .quick-actions {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 12px;
-        width: 100%;
-        max-width: 400px;
-      }
-
-      .quick-card {
-        background: var(--bg-primary);
-        border: 1px solid var(--border);
-        border-radius: var(--radius-md);
-        padding: 16px;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        text-align: left;
-        min-height: 100px;
-        display: flex;
-        flex-direction: column;
-      }
-
-      .quick-card:hover {
-        border-color: var(--accent);
-        box-shadow: var(--shadow-md);
-        transform: translateY(-2px);
-      }
-
-      .quick-card-icon {
-        width: 32px;
-        height: 32px;
-        background: var(--bg-secondary);
-        border-radius: var(--radius-sm);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 12px;
-        color: var(--text-secondary);
-      }
-
-      .quick-card-title {
-        font-size: 13px;
-        font-weight: 500;
-        color: var(--text-primary);
-        line-height: 1.4;
-      }
-
-      /* Messages */
-      .messages {
-        display: flex;
-        flex-direction: column;
-        gap: 24px;
-      }
-
-      .message {
-        display: flex;
-        gap: 12px;
-        animation: fadeIn 0.3s ease;
-      }
-
-      @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(8px); }
-        to { opacity: 1; transform: translateY(0); }
-      }
-
-      .message.user {
-        flex-direction: row-reverse;
-      }
-
-      .message-avatar {
-        width: 32px;
-        height: 32px;
-        border-radius: var(--radius-sm);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-        font-size: 14px;
-        font-weight: 500;
-      }
-
-      .message.assistant .message-avatar {
-        background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
-        color: white;
-      }
-
-      .message.user .message-avatar {
+      .welcome-prompt.hidden {
         display: none;
       }
 
-      .message-content {
-        max-width: 85%;
-        min-width: 0;
+      .welcome-prompt p {
+        font-size: 15px;
+        color: var(--text-secondary);
+        max-width: 260px;
+        line-height: 1.6;
+      }
+
+      /* ── Message Bubbles ── */
+      .message-row {
+        display: flex;
+        flex-direction: column;
+        animation: slideIn 0.3s ease;
+      }
+
+      .message-row.assistant {
+        align-items: flex-start;
+      }
+
+      .message-row.user {
+        align-items: flex-end;
       }
 
       .message-bubble {
+        max-width: 85%;
         padding: 12px 16px;
-        border-radius: var(--radius-lg);
+        border-radius: var(--radius-md);
+        word-wrap: break-word;
+        overflow-wrap: break-word;
         line-height: 1.6;
-        box-shadow: var(--shadow-sm);
+        font-size: 14px;
       }
 
-      .message.user .message-bubble {
-        background: var(--bg-user);
-        color: var(--text-inverse);
-        border-bottom-right-radius: 4px;
-      }
-
-      .message.assistant .message-bubble {
+      .message-row.assistant .message-bubble {
         background: var(--bg-assistant);
-        color: var(--text-primary);
+        color: var(--text-inverse);
         border-bottom-left-radius: 4px;
       }
 
-      /* Formatted content in assistant bubbles */
-      .message-bubble h3, .message-bubble h4 {
+      .message-row.user .message-bubble {
+        background: var(--bg-user);
+        color: var(--text-primary);
+        border-bottom-right-radius: 4px;
+      }
+
+      /* Disclaimer under user messages */
+      .message-disclaimer {
+        font-size: 10px;
+        color: var(--text-secondary);
+        margin-top: 4px;
+        padding-right: 4px;
+        line-height: 1.3;
+        max-width: 85%;
+        text-align: right;
+      }
+
+      /* ── Rich Text in Assistant Bubbles ── */
+      .message-bubble h3,
+      .message-bubble h4 {
         margin: 0 0 8px 0;
         font-weight: 600;
       }
@@ -274,7 +171,8 @@
         margin-bottom: 0;
       }
 
-      .message-bubble ul {
+      .message-bubble ul,
+      .message-bubble ol {
         margin: 8px 0;
         padding-left: 20px;
       }
@@ -286,690 +184,526 @@
         width: 100%;
         border-collapse: collapse;
         margin: 12px 0;
-        font-size: 13px;
+        font-size: 12px;
       }
-      .message-bubble th, .message-bubble td {
-        border: 1px solid var(--border);
-        padding: 8px 10px;
+      .message-row.assistant .message-bubble th,
+      .message-row.assistant .message-bubble td {
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        padding: 6px 8px;
         text-align: left;
       }
-      .message-bubble th {
-        background: rgba(0, 0, 0, 0.04);
+      .message-row.assistant .message-bubble th {
+        background: rgba(255, 255, 255, 0.08);
         font-weight: 600;
       }
-      .message-bubble tr:nth-child(even) td {
-        background: rgba(0, 0, 0, 0.02);
+      .message-row.assistant .message-bubble tr:nth-child(even) td {
+        background: rgba(255, 255, 255, 0.04);
       }
 
       .message-bubble strong {
         font-weight: 600;
       }
 
-      /* Thinking Stages */
-      .thinking-stages {
+      .message-bubble a {
+        color: inherit;
+        text-decoration: underline;
+      }
+
+      /* ── Thinking / Loading ── */
+      .thinking-row {
         display: flex;
-        flex-direction: column;
-        gap: 8px;
-        padding: 4px 0;
+        align-items: flex-start;
+        animation: slideIn 0.3s ease;
       }
 
-      .thinking-stage {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 8px 12px;
-        background: var(--bg-secondary);
-        border-radius: var(--radius-sm);
-        font-size: 13px;
-        color: var(--text-secondary);
-        opacity: 0;
-        transform: translateX(-8px);
-        animation: stageIn 0.3s ease forwards;
+      .thinking-bubble {
+        background: var(--bg-assistant);
+        color: var(--text-inverse);
+        padding: 14px 18px;
+        border-radius: var(--radius-md);
+        border-bottom-left-radius: 4px;
+        max-width: 85%;
       }
 
-      @keyframes stageIn {
-        to { opacity: 1; transform: translateX(0); }
-      }
-
-      .thinking-stage.active {
-        color: var(--accent);
-        background: rgba(59, 130, 246, 0.08);
-      }
-
-      .thinking-stage.complete {
-        color: #10B981;
-        background: rgba(16, 185, 129, 0.08);
-      }
-
-      .thinking-stage .stage-icon {
-        width: 18px;
-        height: 18px;
+      .thinking-dots {
         display: flex;
         align-items: center;
-        justify-content: center;
+        gap: 5px;
+        height: 20px;
       }
 
-      .thinking-stage .spinner {
-        width: 14px;
-        height: 14px;
-        border: 2px solid var(--border);
-        border-top-color: var(--accent);
+      .thinking-dots span {
+        width: 7px;
+        height: 7px;
         border-radius: 50%;
-        animation: spin 0.8s linear infinite;
+        background: rgba(255, 255, 255, 0.5);
+        animation: dotPulse 1.4s ease-in-out infinite;
       }
 
-      @keyframes spin {
-        to { transform: rotate(360deg); }
+      .thinking-dots span:nth-child(2) {
+        animation-delay: 0.2s;
       }
 
-      .thinking-stage .check-icon {
-        color: #10B981;
+      .thinking-dots span:nth-child(3) {
+        animation-delay: 0.4s;
       }
 
-      .thinking-stage .stage-text {
-        flex: 1;
-        font-weight: 500;
+      @keyframes dotPulse {
+        0%, 80%, 100% {
+          opacity: 0.3;
+          transform: scale(0.8);
+        }
+        40% {
+          opacity: 1;
+          transform: scale(1);
+        }
       }
 
-      .thinking-stage .stage-time {
-        font-size: 11px;
-        opacity: 0.7;
-      }
-
-      /* Input Area */
-      .composer {
-        padding: 16px;
-        background: var(--bg-primary);
-        border-top: 1px solid var(--border);
-      }
-
-      .composer-inner {
-        max-width: 768px;
-        margin: 0 auto;
-      }
-
-      .input-wrapper {
-        display: flex;
-        align-items: flex-end;
-        gap: 8px;
-        background: var(--bg-secondary);
-        border: 1px solid var(--border);
-        border-radius: var(--radius-lg);
-        padding: 8px 8px 8px 12px;
-        transition: border-color 0.2s, box-shadow 0.2s;
-      }
-
-      .input-wrapper:focus-within {
-        border-color: var(--accent);
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-      }
-
-      .attach-btn {
-        width: 36px;
-        height: 36px;
-        border: none;
-        background: transparent;
-        color: var(--text-secondary);
-        cursor: pointer;
-        border-radius: var(--radius-sm);
+      /* ── Input Zone ── */
+      .input-container {
         display: flex;
         align-items: center;
-        justify-content: center;
-        transition: background 0.2s, color 0.2s;
+        gap: 8px;
+        padding: 12px;
+        border-top: 1px solid var(--border);
+        background: var(--bg-primary);
         flex-shrink: 0;
-      }
-
-      .attach-btn:hover {
-        background: var(--border);
-        color: var(--text-primary);
       }
 
       .input-field {
         flex: 1;
-        border: none;
-        background: transparent;
-        resize: none;
-        outline: none;
+        padding: 10px 14px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
         font-family: inherit;
-        font-size: 14px;
-        line-height: 1.5;
+        font-size: 16px;
+        line-height: 1.4;
         color: var(--text-primary);
-        min-height: 24px;
-        max-height: 160px;
-        padding: 6px 0;
+        background: var(--bg-primary);
+        outline: none;
+        transition: border-color 0.2s, box-shadow 0.2s;
+        min-height: 44px;
+        -webkit-appearance: none;
+        appearance: none;
       }
 
       .input-field::placeholder {
         color: var(--text-secondary);
+        font-size: 14px;
+      }
+
+      .input-field:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
       }
 
       .send-btn {
-        width: 36px;
-        height: 36px;
+        width: 44px;
+        height: 44px;
         border: none;
-        background: var(--text-primary);
+        border-radius: 50%;
+        background: var(--send-btn);
         color: white;
         cursor: pointer;
-        border-radius: var(--radius-full);
         display: flex;
         align-items: center;
         justify-content: center;
-        transition: transform 0.15s, opacity 0.15s;
+        transition: background 0.2s, transform 0.15s;
         flex-shrink: 0;
+        -webkit-tap-highlight-color: transparent;
       }
 
-      .send-btn:hover {
-        transform: scale(1.05);
+      .send-btn:hover:not(:disabled) {
+        background: var(--send-btn-hover);
       }
 
-      .send-btn:active {
-        transform: scale(0.95);
+      .send-btn:active:not(:disabled) {
+        transform: scale(0.92);
       }
 
       .send-btn:disabled {
         opacity: 0.4;
         cursor: not-allowed;
-        transform: none;
+      }
+
+      .send-btn:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
       }
 
       .send-btn svg {
-        width: 18px;
-        height: 18px;
+        width: 20px;
+        height: 20px;
       }
 
-      /* Hide welcome when chat starts */
-      .chat-started .welcome {
-        display: none;
+      /* ── Error message ── */
+      .error-bubble {
+        background: #FEF2F2 !important;
+        color: #991B1B !important;
+        border: 1px solid #FECACA;
       }
 
-      .chat-started .messages {
-        display: flex;
-      }
-
-      /* Initial state */
-      .messages {
-        display: none;
-      }
-
-      /* Responsive */
-      @media (max-width: 640px) {
-        .chat-container {
-          padding: 16px 12px;
+      /* ── Animations ── */
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateY(8px);
         }
-
-        .welcome-title {
-          font-size: 24px;
-        }
-
-        .quick-actions {
-          grid-template-columns: 1fr;
-          max-width: 100%;
-        }
-
-        .quick-card {
-          min-height: 80px;
-        }
-
-        .message-content {
-          max-width: 90%;
-        }
-
-        .composer {
-          padding: 12px;
+        to {
+          opacity: 1;
+          transform: translateY(0);
         }
       }
 
+      /* ── Responsive: Mobile ── */
+      @media (max-width: 600px) {
+        .messages-container {
+          padding: 12px 8px;
+          gap: 6px;
+        }
+
+        .message-bubble {
+          font-size: 14px;
+          padding: 10px 14px;
+          max-width: 88%;
+        }
+
+        .message-disclaimer {
+          max-width: 88%;
+        }
+
+        .input-container {
+          padding: 8px;
+        }
+
+        .input-field {
+          font-size: 16px;
+          padding: 10px 12px;
+        }
+      }
+
+      /* ── Responsive: Tablet ── */
+      @media (min-width: 601px) and (max-width: 1024px) {
+        .messages-container {
+          padding: 14px 10px;
+        }
+
+        .input-container {
+          padding: 10px;
+        }
+
+        .input-field {
+          font-size: 15px;
+        }
+      }
+
+      /* ── Desktop ── */
+      @media (min-width: 1025px) {
+        .message-bubble {
+          font-size: 15px;
+        }
+      }
+
+      /* ── Safe area for notched devices ── */
+      @supports (padding-bottom: env(safe-area-inset-bottom)) {
+        .input-container {
+          padding-bottom: calc(12px + env(safe-area-inset-bottom));
+        }
+      }
+
+      /* ── Reduced motion ── */
       @media (prefers-reduced-motion: reduce) {
-        .message, .quick-card {
+        .message-row,
+        .thinking-row {
           animation: none;
-          transition: none;
         }
+
+        .thinking-dots span {
+          animation: none;
+          opacity: 0.5;
+        }
+
+        .messages-container {
+          scroll-behavior: auto;
+        }
+      }
+
+      /* ── Focus visible for keyboard users ── */
+      .input-field:focus-visible {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
       }
     </style>
   </head>
 
   <body>
-    <div class="app" id="app">
-      <!-- Header -->
-      <header class="header">
-        <div class="logo">AGENT G1</div>
-        <div class="header-right">Powered by PMF</div>
-      </header>
-
-      <!-- Main Chat Area -->
-      <main class="main">
-        <div class="chat-container" id="chatContainer">
-          <div class="chat-inner">
-            <!-- Welcome State -->
-            <div class="welcome" id="welcome">
-              <div class="welcome-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                  <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                </svg>
-              </div>
-              <h1 class="welcome-title" id="welcomeTitle">Let's find your perfect rate.</h1>
-              <p class="welcome-subtitle">Your AI-powered mortgage assistant</p>
-
-              <div class="quick-actions">
-                <button class="quick-card" data-prompt="Help me understand if I qualify for a mortgage">
-                  <div class="quick-card-icon">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
-                      <circle cx="9" cy="7" r="4"></circle>
-                      <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
-                      <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                    </svg>
-                  </div>
-                  <span class="quick-card-title">Help me qualify</span>
-                </button>
-
-                <button class="quick-card" data-prompt="I'd like to get a rate quote for a home purchase">
-                  <div class="quick-card-icon">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <line x1="12" y1="1" x2="12" y2="23"></line>
-                      <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-                    </svg>
-                  </div>
-                  <span class="quick-card-title">Get a rate quote</span>
-                </button>
-
-                <button class="quick-card" data-prompt="What are current mortgage rates today?">
-                  <div class="quick-card-icon">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline>
-                      <polyline points="16 7 22 7 22 13"></polyline>
-                    </svg>
-                  </div>
-                  <span class="quick-card-title">Today's rates</span>
-                </button>
-
-                <button class="quick-card" data-prompt="I want to refinance my current mortgage">
-                  <div class="quick-card-icon">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path>
-                    </svg>
-                  </div>
-                  <span class="quick-card-title">Refinance options</span>
-                </button>
-              </div>
-            </div>
-
-            <!-- Messages -->
-            <div class="messages" id="messages"></div>
-          </div>
+    <div class="chat-widget" role="main" aria-label="Mortgage Assistant Chat">
+      <!-- Messages Area -->
+      <div class="messages-container" id="messagesContainer" role="log" aria-live="polite" aria-label="Chat messages">
+        <div class="welcome-prompt" id="welcomePrompt">
+          <p>Ask me anything about mortgages, rates, refinancing, or home buying.</p>
         </div>
+      </div>
 
-        <!-- Input Area -->
-        <div class="composer">
-          <div class="composer-inner">
-            <form class="input-wrapper" id="inputForm" autocomplete="off">
-              <button type="button" class="attach-btn" aria-label="Attach file">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <line x1="12" y1="5" x2="12" y2="19"></line>
-                  <line x1="5" y1="12" x2="19" y2="12"></line>
-                </svg>
-              </button>
-
-              <textarea
-                id="inputField"
-                class="input-field"
-                rows="1"
-                placeholder="Ask me anything about your mortgage..."
-                aria-label="Message input"
-              ></textarea>
-
-              <button type="submit" class="send-btn" id="sendBtn" disabled aria-label="Send message">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <line x1="5" y1="12" x2="19" y2="12"></line>
-                  <polyline points="12 5 19 12 12 19"></polyline>
-                </svg>
-              </button>
-            </form>
-          </div>
-        </div>
-      </main>
+      <!-- Input Zone -->
+      <form class="input-container" id="inputForm" autocomplete="off" role="form" aria-label="Send a message">
+        <label for="inputField" class="sr-only" style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0;">Type your message</label>
+        <input
+          type="text"
+          id="inputField"
+          class="input-field"
+          placeholder="Ask me anything about your mortgage..."
+          aria-label="Message input"
+          autocomplete="off"
+          enterkeyhint="send"
+        />
+        <button type="submit" class="send-btn" id="sendBtn" disabled aria-label="Send message">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </button>
+      </form>
     </div>
 
     <script>
-      const PROXY_URL = '/api/chat';
-      const app = document.getElementById('app');
-      const messagesEl = document.getElementById('messages');
-      const chatContainer = document.getElementById('chatContainer');
-      const inputForm = document.getElementById('inputForm');
-      const inputField = document.getElementById('inputField');
-      const sendBtn = document.getElementById('sendBtn');
-      const welcomeTitle = document.getElementById('welcomeTitle');
-      const quickCards = document.querySelectorAll('.quick-card');
+      (function() {
+        'use strict';
 
-      let conversationHistory = [];
-      let chatStarted = false;
+        const PROXY_URL = '/api/chat';
+        const DISCLAIMER_TEXT = 'AI agents can make mistakes. Check important info. Intended for informational use.';
 
-      // Rotating welcome greetings
-      const greetings = [
-        "Let's find your perfect rate.",
-        "Ready to unlock your dream home?",
-        "Your mortgage journey starts here.",
-        "Let's make homeownership happen.",
-        "What can I help you with today?",
-        "Let's explore your options together.",
-        "Ready to save on your mortgage?",
-        "Your path to homeownership awaits."
-      ];
+        const messagesContainer = document.getElementById('messagesContainer');
+        const welcomePrompt = document.getElementById('welcomePrompt');
+        const inputForm = document.getElementById('inputForm');
+        const inputField = document.getElementById('inputField');
+        const sendBtn = document.getElementById('sendBtn');
 
-      // Set random greeting on load
-      welcomeTitle.textContent = greetings[Math.floor(Math.random() * greetings.length)];
+        let conversationHistory = [];
+        let isProcessing = false;
 
-      // Auto-grow textarea
-      const autoGrow = (el) => {
-        el.style.height = '24px';
-        el.style.height = Math.min(el.scrollHeight, 160) + 'px';
-      };
+        // ── Helpers ──
 
-      const updateSendBtn = () => {
-        sendBtn.disabled = !inputField.value.trim();
-      };
-
-      const scrollToBottom = () => {
-        chatContainer.scrollTop = chatContainer.scrollHeight;
-      };
-
-      const startChat = () => {
-        if (chatStarted) return;
-        chatStarted = true;
-        app.classList.add('chat-started');
-      };
-
-      // Thinking stages configuration
-      const thinkingStages = [
-        { id: 'analyze', text: 'Analyzing your question', delay: 0 },
-        { id: 'search', text: 'Searching program matrices', delay: 600 },
-        { id: 'calculate', text: 'Calculating eligibility', delay: 1500 },
-        { id: 'format', text: 'Preparing response', delay: 2800 }
-      ];
-
-      let stageTimers = [];
-      let stageStartTime = 0;
-      let currentStageIndex = 0;
-      let elapsedInterval = null;
-
-      // Format cell content (handle bold within cells)
-      const formatCellContent = (text) => {
-        return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-      };
-
-      // Convert markdown tables
-      const convertMarkdownTables = (text) => {
-        const tableRegex = /\|(.+)\|\n\|[-|\s]+\|\n((?:\|.+\|\n?)+)/g;
-
-        return text.replace(tableRegex, (match, headerRow, bodyRows) => {
-          const headers = headerRow.split('|').map(h => h.trim()).filter(h => h);
-          const rows = bodyRows.trim().split('\n');
-
-          let table = '<table><thead><tr>';
-          headers.forEach(h => {
-            table += `<th>${formatCellContent(h)}</th>`;
+        const scrollToBottom = () => {
+          requestAnimationFrame(() => {
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
           });
-          table += '</tr></thead><tbody>';
+        };
 
-          rows.forEach(row => {
-            const cells = row.split('|').map(c => c.trim()).filter(c => c);
-            table += '<tr>';
-            cells.forEach(c => {
-              table += `<td>${formatCellContent(c)}</td>`;
+        const hideWelcome = () => {
+          if (welcomePrompt && !welcomePrompt.classList.contains('hidden')) {
+            welcomePrompt.classList.add('hidden');
+          }
+        };
+
+        const updateSendBtn = () => {
+          sendBtn.disabled = !inputField.value.trim() || isProcessing;
+        };
+
+        // ── Markdown Formatting ──
+
+        const formatCellContent = (text) => {
+          return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        };
+
+        const convertMarkdownTables = (text) => {
+          const tableRegex = /\|(.+)\|\n\|[-|\s]+\|\n((?:\|.+\|\n?)+)/g;
+          return text.replace(tableRegex, (match, headerRow, bodyRows) => {
+            const headers = headerRow.split('|').map(h => h.trim()).filter(h => h);
+            const rows = bodyRows.trim().split('\n');
+            let table = '<table><thead><tr>';
+            headers.forEach(h => { table += '<th>' + formatCellContent(h) + '</th>'; });
+            table += '</tr></thead><tbody>';
+            rows.forEach(row => {
+              const cells = row.split('|').map(c => c.trim()).filter(c => c);
+              table += '<tr>';
+              cells.forEach(c => { table += '<td>' + formatCellContent(c) + '</td>'; });
+              table += '</tr>';
             });
-            table += '</tr>';
+            table += '</tbody></table>';
+            return table;
           });
-          table += '</tbody></table>';
-          return table;
-        });
-      };
+        };
 
-      // Format assistant response (markdown to HTML)
-      const formatResponse = (text) => {
-        if (!text) return 'No response received';
+        const formatResponse = (text) => {
+          if (!text) return 'No response received.';
+          let f = text;
 
-        let formatted = text;
+          // Tables first
+          f = convertMarkdownTables(f);
 
-        // Convert markdown tables first (before other processing)
-        formatted = convertMarkdownTables(formatted);
+          // Headers
+          f = f.replace(/^### (.*$)/gm, '<h4>$1</h4>');
+          f = f.replace(/^## (.*$)/gm, '<h3>$1</h3>');
 
-        // Convert markdown headers
-        formatted = formatted.replace(/^### (.*$)/gm, '<h4>$1</h4>');
-        formatted = formatted.replace(/^## (.*$)/gm, '<h3>$1</h3>');
+          // Bold & italic
+          f = f.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+          f = f.replace(/\*(.*?)\*/g, '<em>$1</em>');
 
-        // Convert **bold** to <strong> (outside of tables)
-        formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+          // Bullets
+          f = f.replace(/^- (.*$)/gm, '<li>$1</li>');
+          f = f.replace(/(<li>.*<\/li>\n?)+/g, '<ul>$&</ul>');
 
-        // Convert *italic* to <em>
-        formatted = formatted.replace(/\*(.*?)\*/g, '<em>$1</em>');
+          // Numbered lists
+          f = f.replace(/^\d+\.\s+(.*$)/gm, '<li>$1</li>');
 
-        // Convert bullet points
-        formatted = formatted.replace(/^- (.*$)/gm, '<li>$1</li>');
-        formatted = formatted.replace(/(<li>.*<\/li>\n?)+/g, '<ul>$&</ul>');
+          // Line breaks
+          f = f.replace(/\n\n/g, '</p><p>');
+          f = f.replace(/\n/g, '<br>');
 
-        // Convert line breaks
-        formatted = formatted.replace(/\n\n/g, '</p><p>');
-        formatted = formatted.replace(/\n/g, '<br>');
+          if (!f.startsWith('<')) {
+            f = '<p>' + f + '</p>';
+          }
+          return f;
+        };
 
-        // Wrap in paragraph if not already structured
-        if (!formatted.startsWith('<')) {
-          formatted = '<p>' + formatted + '</p>';
-        }
+        // ── Message Rendering ──
 
-        return formatted;
-      };
+        const addMessage = (role, text, isError) => {
+          // Remove thinking indicator
+          const thinkingEl = document.getElementById('thinkingIndicator');
+          if (thinkingEl) thinkingEl.remove();
 
-      // Add message to chat
-      const addMessage = (role, text) => {
-        const thinkingEl = document.getElementById('thinkingMessage');
-        if (thinkingEl) {
-          clearThinkingStages();
-          setTimeout(() => thinkingEl.remove(), 300);
-        }
+          const row = document.createElement('div');
+          row.className = 'message-row ' + role;
+          row.setAttribute('role', 'article');
+          row.setAttribute('aria-label', role === 'user' ? 'You said' : 'Assistant said');
 
-        const message = document.createElement('div');
-        message.className = `message ${role}`;
+          const bubble = document.createElement('div');
+          bubble.className = 'message-bubble' + (isError ? ' error-bubble' : '');
 
-        const avatar = document.createElement('div');
-        avatar.className = 'message-avatar';
-        if (role === 'assistant') {
-          avatar.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>';
-        }
+          if (role === 'assistant') {
+            bubble.innerHTML = formatResponse(text);
+          } else {
+            bubble.textContent = text;
+          }
 
-        const content = document.createElement('div');
-        content.className = 'message-content';
+          row.appendChild(bubble);
 
-        const bubble = document.createElement('div');
-        bubble.className = 'message-bubble';
+          // Add disclaimer under user messages
+          if (role === 'user') {
+            const disclaimer = document.createElement('div');
+            disclaimer.className = 'message-disclaimer';
+            disclaimer.textContent = DISCLAIMER_TEXT;
+            disclaimer.setAttribute('aria-hidden', 'true');
+            row.appendChild(disclaimer);
+          }
 
-        if (role === 'assistant') {
-          bubble.innerHTML = formatResponse(text);
-        } else {
-          bubble.textContent = text;
-        }
-
-        content.appendChild(bubble);
-        message.appendChild(avatar);
-        message.appendChild(content);
-        messagesEl.appendChild(message);
-
-        scrollToBottom();
-      };
-
-      // Show thinking stages
-      const showThinking = () => {
-        const message = document.createElement('div');
-        message.className = 'message assistant';
-        message.id = 'thinkingMessage';
-
-        const avatar = document.createElement('div');
-        avatar.className = 'message-avatar';
-        avatar.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>';
-
-        const content = document.createElement('div');
-        content.className = 'message-content';
-
-        const bubble = document.createElement('div');
-        bubble.className = 'message-bubble';
-
-        let stagesHtml = '<div class="thinking-stages">';
-        thinkingStages.forEach(stage => {
-          stagesHtml += `<div class="thinking-stage" id="stage-${stage.id}" style="display:none;">
-            <div class="stage-icon"><div class="spinner"></div></div>
-            <span class="stage-text">${stage.text}</span>
-            <span class="stage-time" id="time-${stage.id}"></span>
-          </div>`;
-        });
-        stagesHtml += '</div>';
-        bubble.innerHTML = stagesHtml;
-
-        content.appendChild(bubble);
-        message.appendChild(avatar);
-        message.appendChild(content);
-        messagesEl.appendChild(message);
-
-        scrollToBottom();
-        startThinkingStages();
-      };
-
-      const startThinkingStages = () => {
-        stageStartTime = Date.now();
-        currentStageIndex = 0;
-        stageTimers = [];
-
-        // Activate first stage immediately
-        activateStage(0);
-
-        // Schedule subsequent stages
-        stageTimers.push(setTimeout(() => { completeStage(0); activateStage(1); }, 600));
-        stageTimers.push(setTimeout(() => { completeStage(1); activateStage(2); }, 1500));
-        stageTimers.push(setTimeout(() => { completeStage(2); activateStage(3); }, 2800));
-
-        // Update elapsed time
-        elapsedInterval = setInterval(updateElapsedTime, 100);
-      };
-
-      const activateStage = (index) => {
-        if (index >= thinkingStages.length) return;
-        const stage = document.getElementById(`stage-${thinkingStages[index].id}`);
-        if (stage) {
-          stage.style.display = 'flex';
-          stage.style.animationDelay = '0s';
-          stage.className = 'thinking-stage active';
-          currentStageIndex = index;
+          messagesContainer.appendChild(row);
           scrollToBottom();
-        }
-      };
+        };
 
-      const completeStage = (index) => {
-        const stage = document.getElementById(`stage-${thinkingStages[index].id}`);
-        if (stage) {
-          stage.className = 'thinking-stage complete';
-          stage.querySelector('.stage-icon').innerHTML = '<svg class="check-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
-        }
-      };
+        const showThinking = () => {
+          const row = document.createElement('div');
+          row.className = 'thinking-row';
+          row.id = 'thinkingIndicator';
+          row.setAttribute('role', 'status');
+          row.setAttribute('aria-label', 'Assistant is typing');
 
-      const updateElapsedTime = () => {
-        const elapsed = ((Date.now() - stageStartTime) / 1000).toFixed(1);
-        const timeEl = document.getElementById(`time-${thinkingStages[currentStageIndex].id}`);
-        if (timeEl) timeEl.textContent = `${elapsed}s`;
-      };
+          const bubble = document.createElement('div');
+          bubble.className = 'thinking-bubble';
+          bubble.innerHTML = '<div class="thinking-dots"><span></span><span></span><span></span></div>';
 
-      const clearThinkingStages = () => {
-        stageTimers.forEach(timer => clearTimeout(timer));
-        stageTimers = [];
-        if (elapsedInterval) {
-          clearInterval(elapsedInterval);
-          elapsedInterval = null;
-        }
-        // Complete all stages before removing
-        thinkingStages.forEach((stage, i) => {
-          completeStage(i);
-          const stageEl = document.getElementById(`stage-${stage.id}`);
-          if (stageEl) stageEl.style.display = 'flex';
-        });
-      };
+          row.appendChild(bubble);
+          messagesContainer.appendChild(row);
+          scrollToBottom();
+        };
 
-      // Send message to API
-      const sendMessage = async (text) => {
-        startChat();
-        addMessage('user', text);
-        conversationHistory.push({ role: 'user', content: text });
+        // ── Send Message ──
 
-        showThinking();
-        sendBtn.disabled = true;
+        const sendMessage = async (text) => {
+          if (isProcessing || !text) return;
 
-        try {
-          const res = await fetch(PROXY_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              message: text,
-              conversationHistory: conversationHistory,
-              lastFormValues: {},
-              enableCaching: true
-            }),
-          });
+          hideWelcome();
+          isProcessing = true;
 
-          if (!res.ok) throw new Error('Request failed');
+          addMessage('user', text);
+          conversationHistory.push({ role: 'user', content: text });
 
-          const data = await res.json();
-          const responseText = data.response || data.message || JSON.stringify(data);
+          showThinking();
+          updateSendBtn();
 
-          conversationHistory.push({ role: 'assistant', content: responseText });
-          addMessage('assistant', responseText);
+          try {
+            const res = await fetch(PROXY_URL, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                message: text,
+                conversationHistory: conversationHistory,
+                lastFormValues: {},
+                enableCaching: true
+              }),
+            });
 
-        } catch (err) {
-          addMessage('assistant', 'Sorry, something went wrong. Please try again.');
-        }
+            if (!res.ok) throw new Error('Request failed (' + res.status + ')');
 
-        updateSendBtn();
-        inputField.focus();
-      };
+            const data = await res.json();
+            const responseText = data.response || data.message || JSON.stringify(data);
 
-      // Event listeners
-      inputField.addEventListener('input', () => {
-        autoGrow(inputField);
-        updateSendBtn();
-      });
+            conversationHistory.push({ role: 'assistant', content: responseText });
+            addMessage('assistant', responseText);
 
-      inputField.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-          e.preventDefault();
-          if (!sendBtn.disabled) inputForm.requestSubmit();
-        }
-      });
+          } catch (err) {
+            addMessage('assistant', 'Something went wrong. Please try again.', true);
+          }
 
-      inputForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const text = inputField.value.trim();
-        if (!text) return;
+          isProcessing = false;
+          updateSendBtn();
+          inputField.focus();
+        };
 
-        inputField.value = '';
-        autoGrow(inputField);
-        updateSendBtn();
+        // ── Event Listeners ──
 
-        sendMessage(text);
-      });
+        inputField.addEventListener('input', updateSendBtn);
 
-      // Quick action cards
-      quickCards.forEach(card => {
-        card.addEventListener('click', () => {
-          const prompt = card.dataset.prompt;
-          if (prompt) {
-            inputField.value = prompt;
-            autoGrow(inputField);
-            updateSendBtn();
-            sendMessage(prompt);
-            inputField.value = '';
+        inputField.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            if (!sendBtn.disabled) inputForm.requestSubmit();
           }
         });
-      });
 
-      // Initialize
-      autoGrow(inputField);
-      updateSendBtn();
+        // Escape to clear input
+        inputField.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape') {
+            inputField.value = '';
+            updateSendBtn();
+          }
+        });
+
+        inputForm.addEventListener('submit', (e) => {
+          e.preventDefault();
+          const text = inputField.value.trim();
+          if (!text) return;
+          inputField.value = '';
+          updateSendBtn();
+          sendMessage(text);
+        });
+
+        // ── Prevent parent page scroll conflicts ──
+        messagesContainer.addEventListener('touchmove', (e) => {
+          e.stopPropagation();
+        }, { passive: true });
+
+        // ── Adjust for mobile keyboard ──
+        if (window.visualViewport) {
+          window.visualViewport.addEventListener('resize', () => {
+            scrollToBottom();
+          });
+        }
+
+        // ── Init ──
+        updateSendBtn();
+        inputField.focus();
+
+        // Notify parent frame the widget is ready
+        try {
+          if (window.parent !== window) {
+            window.parent.postMessage({ type: 'g1-widget-ready' }, '*');
+          }
+        } catch (e) { /* cross-origin, ignore */ }
+
+      })();
     </script>
   </body>
 </html>

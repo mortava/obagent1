@@ -1,4 +1,4 @@
 module.exports = (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.json({ status: 'ok', message: 'g1brokerAgent is running' });
+    res.json({ status: 'ok', service: 'obagent1' });
 };

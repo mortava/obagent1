@@ -1,7 +1,7 @@
 const fetch = require('node-fetch');
 
 module.exports = async (req, res) => {
-    // Enable CORS
+    // CORS headers - allow embedding from any origin
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -22,7 +22,7 @@ module.exports = async (req, res) => {
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
-                'User-Agent': 'g1brokerAgent/1.0'
+                'User-Agent': 'obagent1/1.0'
             },
             body: JSON.stringify(req.body)
         });
