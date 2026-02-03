@@ -1,0 +1,50 @@
+You are helping me improve and refine a mortgage assistant chatbot application. 
+Please make the following changes:
+
+### TEXT REPLACEMENTS:
+1. Replace "AGENT G1" with "PMF AI Mortgage Assistant"
+2. Change "Powered by PMF" to "Powered by G1 GROUP"
+3. Remove the text "Your AI-powered mortgage assistant"
+
+### CARDS/BUTTONS - MODIFY TO SHOW ONLY 3 CARDS:
+Replace the current 4 cards with exactly 3 cards:
+1. "Help me find the right Loan"
+2. "I have a scenario I need help with"
+3. "Build a Live Rate Quote"
+
+Keep the same card styling and icon system.
+
+### LAYOUT IMPROVEMENTS:
+1. The text input area should start as a CENTERED BOX in the initial view
+2. After the user sends the first chat message, the input area should DROP DOWN to the bottom of the screen
+3. Ensure smooth transition between these two states
+
+### MOBILE & IFRAME OPTIMIZATION:
+1. Make the application fully responsive for mobile devices
+2. Optimize the layout to render perfectly within an iframe
+3. Ensure proper spacing and padding for mobile viewport (320px and up)
+4. Remove any elements that might break iframe functionality
+5. Test and ensure the app works seamlessly on all screen sizes
+
+### DISCLAIMER:
+Add a small disclaimer text below the input area (or at the bottom) that reads:
+"⚠️ AI can make mistakes, please check with your MLO for accuracy"
+Style it with small, subtle text (gray color, smaller font size)
+
+### ICON REPLACEMENT:
+Replace the blue HOME icon with a more modern, cool mortgage-related icon that:
+- Is contemporary and visually appealing
+- Still clearly relates to mortgages/home financing
+- Maintains the same size and position
+- Complements the overall design aesthetic
+- Consider icons like: a modern house silhouette, a key with a house outline, a percentage symbol in a home shape, or a modern mortgage/loan related icon
+
+### GENERAL IMPROVEMENTS:
+1. Ensure all text is properly centered and aligned
+2. Maintain consistent spacing throughout
+3. Optimize performance for iframe embedding
+4. Ensure no console errors
+5. Test thoroughly on mobile devices (especially small screens like iPhone SE)
+
+### PRIORITY:
+The mobile responsiveness and iframe compatibility are critical - please make sure this works perfectly when embedded in an iframe and on mobile devices.
