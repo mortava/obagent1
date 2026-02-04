@@ -259,6 +259,35 @@
         }
       }
 
+      /* ── Centered input state (before chat starts) ── */
+      .chat-widget.centered .messages-container {
+        display: flex;
+        flex: 1;
+      }
+
+      .chat-widget.centered .input-zone {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: calc(100% - 24px);
+        max-width: 500px;
+      }
+
+      .chat-widget.centered .input-container {
+        border-top: none;
+      }
+
+      .chat-widget.centered .input-disclaimer {
+        padding-bottom: 0;
+      }
+
+      /* ── Docked input state (after chat starts) ── */
+      .chat-widget:not(.centered) .input-zone {
+        flex-shrink: 0;
+        transition: all 0.3s ease;
+      }
+
       /* ── Input Zone ── */
       .input-container {
         display: flex;
@@ -268,6 +297,77 @@
         border-top: 1px solid var(--border);
         background: var(--bg-primary);
         flex-shrink: 0;
+      }
+
+      /* ── Thinking Stages ── */
+      .thinking-stages {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 4px 0;
+      }
+
+      .thinking-stage {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 12px;
+        background: rgba(0, 0, 0, 0.03);
+        border-radius: var(--radius-sm);
+        font-size: 13px;
+        color: var(--text-secondary);
+        opacity: 0;
+        transform: translateX(-8px);
+        animation: stageIn 0.3s ease forwards;
+      }
+
+      @keyframes stageIn {
+        to { opacity: 1; transform: translateX(0); }
+      }
+
+      .thinking-stage.active {
+        color: var(--accent);
+        background: rgba(59, 130, 246, 0.08);
+      }
+
+      .thinking-stage.complete {
+        color: #10B981;
+        background: rgba(16, 185, 129, 0.08);
+      }
+
+      .thinking-stage .stage-icon {
+        width: 18px;
+        height: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .thinking-stage .spinner {
+        width: 14px;
+        height: 14px;
+        border: 2px solid var(--border);
+        border-top-color: var(--accent);
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+      }
+
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+
+      .thinking-stage .check-icon {
+        color: #10B981;
+      }
+
+      .thinking-stage .stage-text {
+        flex: 1;
+        font-weight: 500;
+      }
+
+      .thinking-stage .stage-time {
+        font-size: 11px;
+        opacity: 0.7;
       }
 
       .input-wrapper {
@@ -382,10 +482,6 @@
           max-width: 88%;
         }
 
-        .message-disclaimer {
-          max-width: 88%;
-        }
-
         .input-container {
           padding: 8px;
         }
@@ -459,7 +555,7 @@
   </head>
 
   <body>
-    <div class="chat-widget" role="main" aria-label="Mortgage Assistant Chat">
+    <div class="chat-widget centered" id="chatWidget" role="main" aria-label="Mortgage Assistant Chat">
       <!-- Messages Area -->
       <div class="messages-container" id="messagesContainer" role="log" aria-live="polite" aria-label="Chat messages">
         <div class="welcome-prompt" id="welcomePrompt">
@@ -467,28 +563,30 @@
         </div>
       </div>
 
-      <!-- Input Zone -->
-      <form class="input-container" id="inputForm" autocomplete="off" role="form" aria-label="Send a message">
-        <div class="input-wrapper">
-          <label for="inputField" class="sr-only" style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0;">Type your message</label>
-          <textarea
-            id="inputField"
-            class="input-field"
-            rows="1"
-            placeholder="Ask me anything about your mortgage..."
-            aria-label="Message input"
-            autocomplete="off"
-            enterkeyhint="send"
-          ></textarea>
-        </div>
-        <button type="submit" class="send-btn" id="sendBtn" disabled aria-label="Send message">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="5" y1="12" x2="19" y2="12"></line>
-            <polyline points="12 5 19 12 12 19"></polyline>
-          </svg>
-        </button>
-      </form>
-      <div class="input-disclaimer" aria-hidden="true">AI agents can make mistakes. Check important info. Intended for informational use.</div>
+      <!-- Input Zone (floats center initially, docks to bottom on chat start) -->
+      <div class="input-zone" id="inputZone">
+        <form class="input-container" id="inputForm" autocomplete="off" role="form" aria-label="Send a message">
+          <div class="input-wrapper">
+            <label for="inputField" class="sr-only" style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0;">Type your message</label>
+            <textarea
+              id="inputField"
+              class="input-field"
+              rows="1"
+              placeholder="Ask me anything about your mortgage..."
+              aria-label="Message input"
+              autocomplete="off"
+              enterkeyhint="send"
+            ></textarea>
+          </div>
+          <button type="submit" class="send-btn" id="sendBtn" disabled aria-label="Send message">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </button>
+        </form>
+        <div class="input-disclaimer" aria-hidden="true">AI agents can make mistakes. Check important info. Intended for informational use.</div>
+      </div>
     </div>
 
     <script>
@@ -497,6 +595,7 @@
 
         const PROXY_URL = '/api/chat';
 
+        const chatWidget = document.getElementById('chatWidget');
         const messagesContainer = document.getElementById('messagesContainer');
         const welcomePrompt = document.getElementById('welcomePrompt');
         const inputForm = document.getElementById('inputForm');
@@ -505,6 +604,19 @@
 
         let conversationHistory = [];
         let isProcessing = false;
+        let chatStarted = false;
+
+        // ── Thinking stages config ──
+        const thinkingStages = [
+          { id: 'analyze', text: 'Analyzing your question' },
+          { id: 'search', text: 'Searching program matrices' },
+          { id: 'calculate', text: 'Calculating eligibility' },
+          { id: 'format', text: 'Preparing response' }
+        ];
+        let stageTimers = [];
+        let stageStartTime = 0;
+        let currentStageIndex = 0;
+        let elapsedInterval = null;
 
         // ── Auto-grow textarea ──
         const autoGrow = (el) => {
@@ -520,7 +632,11 @@
           });
         };
 
-        const hideWelcome = () => {
+        const dockInput = () => {
+          if (!chatStarted) {
+            chatStarted = true;
+            chatWidget.classList.remove('centered');
+          }
           if (welcomePrompt && !welcomePrompt.classList.contains('hidden')) {
             welcomePrompt.classList.add('hidden');
           }
@@ -590,9 +706,12 @@
         // ── Message Rendering ──
 
         const addMessage = (role, text, isError) => {
-          // Remove thinking indicator
+          // Clear thinking stages and remove indicator
           const thinkingEl = document.getElementById('thinkingIndicator');
-          if (thinkingEl) thinkingEl.remove();
+          if (thinkingEl) {
+            clearThinkingStages();
+            setTimeout(() => thinkingEl.remove(), 300);
+          }
 
           const row = document.createElement('div');
           row.className = 'message-row ' + role;
@@ -615,18 +734,77 @@
 
         const showThinking = () => {
           const row = document.createElement('div');
-          row.className = 'thinking-row';
+          row.className = 'message-row assistant';
           row.id = 'thinkingIndicator';
           row.setAttribute('role', 'status');
-          row.setAttribute('aria-label', 'Assistant is typing');
+          row.setAttribute('aria-label', 'Assistant is thinking');
 
           const bubble = document.createElement('div');
-          bubble.className = 'thinking-bubble';
-          bubble.innerHTML = '<div class="thinking-dots"><span></span><span></span><span></span></div>';
+          bubble.className = 'message-bubble';
+
+          let html = '<div class="thinking-stages">';
+          thinkingStages.forEach(stage => {
+            html += '<div class="thinking-stage" id="stage-' + stage.id + '" style="display:none;">' +
+              '<div class="stage-icon"><div class="spinner"></div></div>' +
+              '<span class="stage-text">' + stage.text + '</span>' +
+              '<span class="stage-time" id="time-' + stage.id + '"></span>' +
+              '</div>';
+          });
+          html += '</div>';
+          bubble.innerHTML = html;
 
           row.appendChild(bubble);
           messagesContainer.appendChild(row);
           scrollToBottom();
+          startThinkingStages();
+        };
+
+        const startThinkingStages = () => {
+          stageStartTime = Date.now();
+          currentStageIndex = 0;
+          stageTimers = [];
+          activateStage(0);
+          stageTimers.push(setTimeout(() => { completeStage(0); activateStage(1); }, 600));
+          stageTimers.push(setTimeout(() => { completeStage(1); activateStage(2); }, 1500));
+          stageTimers.push(setTimeout(() => { completeStage(2); activateStage(3); }, 2800));
+          elapsedInterval = setInterval(updateElapsedTime, 100);
+        };
+
+        const activateStage = (index) => {
+          if (index >= thinkingStages.length) return;
+          const stage = document.getElementById('stage-' + thinkingStages[index].id);
+          if (stage) {
+            stage.style.display = 'flex';
+            stage.className = 'thinking-stage active';
+            currentStageIndex = index;
+            scrollToBottom();
+          }
+        };
+
+        const completeStage = (index) => {
+          if (index >= thinkingStages.length) return;
+          const stage = document.getElementById('stage-' + thinkingStages[index].id);
+          if (stage) {
+            stage.className = 'thinking-stage complete';
+            stage.querySelector('.stage-icon').innerHTML = '<svg class="check-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+          }
+        };
+
+        const updateElapsedTime = () => {
+          const elapsed = ((Date.now() - stageStartTime) / 1000).toFixed(1);
+          const timeEl = document.getElementById('time-' + thinkingStages[currentStageIndex].id);
+          if (timeEl) timeEl.textContent = elapsed + 's';
+        };
+
+        const clearThinkingStages = () => {
+          stageTimers.forEach(timer => clearTimeout(timer));
+          stageTimers = [];
+          if (elapsedInterval) { clearInterval(elapsedInterval); elapsedInterval = null; }
+          thinkingStages.forEach((stage, i) => {
+            completeStage(i);
+            const el = document.getElementById('stage-' + stage.id);
+            if (el) el.style.display = 'flex';
+          });
         };
 
         // ── Send Message ──
@@ -634,7 +812,7 @@
         const sendMessage = async (text) => {
           if (isProcessing || !text) return;
 
-          hideWelcome();
+          dockInput();
           isProcessing = true;
 
           addMessage('user', text);
