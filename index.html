@@ -9,7 +9,7 @@
     <style>
       :root {
         --bg-primary: #FFFFFF;
-        --bg-assistant: #1F2937;
+        --bg-assistant: #F3F4F6;
         --bg-user: #DBEAFE;
         --text-primary: #111827;
         --text-secondary: #6B7280;
@@ -134,7 +134,7 @@
 
       .message-row.assistant .message-bubble {
         background: var(--bg-assistant);
-        color: var(--text-inverse);
+        color: var(--text-primary);
         border-bottom-left-radius: 4px;
       }
 
@@ -144,15 +144,15 @@
         border-bottom-right-radius: 4px;
       }
 
-      /* Disclaimer under user messages */
-      .message-disclaimer {
+      /* Static disclaimer under input */
+      .input-disclaimer {
         font-size: 10px;
         color: var(--text-secondary);
-        margin-top: 4px;
-        padding-right: 4px;
+        text-align: center;
+        padding: 4px 12px 8px;
         line-height: 1.3;
-        max-width: 85%;
-        text-align: right;
+        background: var(--bg-primary);
+        flex-shrink: 0;
       }
 
       /* ── Rich Text in Assistant Bubbles ── */
@@ -188,16 +188,16 @@
       }
       .message-row.assistant .message-bubble th,
       .message-row.assistant .message-bubble td {
-        border: 1px solid rgba(255, 255, 255, 0.15);
+        border: 1px solid var(--border);
         padding: 6px 8px;
         text-align: left;
       }
       .message-row.assistant .message-bubble th {
-        background: rgba(255, 255, 255, 0.08);
+        background: rgba(0, 0, 0, 0.04);
         font-weight: 600;
       }
       .message-row.assistant .message-bubble tr:nth-child(even) td {
-        background: rgba(255, 255, 255, 0.04);
+        background: rgba(0, 0, 0, 0.02);
       }
 
       .message-bubble strong {
@@ -218,7 +218,7 @@
 
       .thinking-bubble {
         background: var(--bg-assistant);
-        color: var(--text-inverse);
+        color: var(--text-primary);
         padding: 14px 18px;
         border-radius: var(--radius-md);
         border-bottom-left-radius: 4px;
@@ -236,7 +236,7 @@
         width: 7px;
         height: 7px;
         border-radius: 50%;
-        background: rgba(255, 255, 255, 0.5);
+        background: rgba(0, 0, 0, 0.3);
         animation: dotPulse 1.4s ease-in-out infinite;
       }
 
@@ -262,27 +262,45 @@
       /* ── Input Zone ── */
       .input-container {
         display: flex;
-        align-items: center;
-        gap: 8px;
+        align-items: flex-end;
+        gap: 10px;
         padding: 12px;
         border-top: 1px solid var(--border);
         background: var(--bg-primary);
         flex-shrink: 0;
       }
 
+      .input-wrapper {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        background: var(--bg-primary);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        padding: 12px 14px;
+        transition: border-color 0.2s, box-shadow 0.2s;
+        min-height: 56px;
+      }
+
+      .input-wrapper:focus-within {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+      }
+
       .input-field {
         flex: 1;
-        padding: 10px 14px;
-        border: 1px solid var(--border);
-        border-radius: var(--radius-sm);
+        border: none;
+        background: transparent;
+        resize: none;
+        outline: none;
         font-family: inherit;
         font-size: 16px;
-        line-height: 1.4;
+        line-height: 1.5;
         color: var(--text-primary);
-        background: var(--bg-primary);
-        outline: none;
-        transition: border-color 0.2s, box-shadow 0.2s;
-        min-height: 44px;
+        min-height: 24px;
+        max-height: 160px;
+        padding: 0;
+        overflow-y: auto;
         -webkit-appearance: none;
         appearance: none;
       }
@@ -290,11 +308,6 @@
       .input-field::placeholder {
         color: var(--text-secondary);
         font-size: 14px;
-      }
-
-      .input-field:focus {
-        border-color: var(--accent);
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
       }
 
       .send-btn {
@@ -311,6 +324,7 @@
         transition: background 0.2s, transform 0.15s;
         flex-shrink: 0;
         -webkit-tap-highlight-color: transparent;
+        margin-bottom: 2px;
       }
 
       .send-btn:hover:not(:disabled) {
@@ -376,9 +390,13 @@
           padding: 8px;
         }
 
+        .input-wrapper {
+          padding: 10px 12px;
+          min-height: 50px;
+        }
+
         .input-field {
           font-size: 16px;
-          padding: 10px 12px;
         }
       }
 
@@ -390,6 +408,10 @@
 
         .input-container {
           padding: 10px;
+        }
+
+        .input-wrapper {
+          min-height: 54px;
         }
 
         .input-field {
@@ -429,9 +451,9 @@
       }
 
       /* ── Focus visible for keyboard users ── */
-      .input-field:focus-visible {
+      .input-wrapper:focus-within {
         border-color: var(--accent);
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
       }
     </style>
   </head>
@@ -447,16 +469,18 @@
 
       <!-- Input Zone -->
       <form class="input-container" id="inputForm" autocomplete="off" role="form" aria-label="Send a message">
-        <label for="inputField" class="sr-only" style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0;">Type your message</label>
-        <input
-          type="text"
-          id="inputField"
-          class="input-field"
-          placeholder="Ask me anything about your mortgage..."
-          aria-label="Message input"
-          autocomplete="off"
-          enterkeyhint="send"
-        />
+        <div class="input-wrapper">
+          <label for="inputField" class="sr-only" style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0;">Type your message</label>
+          <textarea
+            id="inputField"
+            class="input-field"
+            rows="1"
+            placeholder="Ask me anything about your mortgage..."
+            aria-label="Message input"
+            autocomplete="off"
+            enterkeyhint="send"
+          ></textarea>
+        </div>
         <button type="submit" class="send-btn" id="sendBtn" disabled aria-label="Send message">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -464,6 +488,7 @@
           </svg>
         </button>
       </form>
+      <div class="input-disclaimer" aria-hidden="true">AI agents can make mistakes. Check important info. Intended for informational use.</div>
     </div>
 
     <script>
@@ -471,7 +496,6 @@
         'use strict';
 
         const PROXY_URL = '/api/chat';
-        const DISCLAIMER_TEXT = 'AI agents can make mistakes. Check important info. Intended for informational use.';
 
         const messagesContainer = document.getElementById('messagesContainer');
         const welcomePrompt = document.getElementById('welcomePrompt');
@@ -481,6 +505,12 @@
 
         let conversationHistory = [];
         let isProcessing = false;
+
+        // ── Auto-grow textarea ──
+        const autoGrow = (el) => {
+          el.style.height = '24px';
+          el.style.height = Math.min(el.scrollHeight, 160) + 'px';
+        };
 
         // ── Helpers ──
 
@@ -579,16 +609,6 @@
           }
 
           row.appendChild(bubble);
-
-          // Add disclaimer under user messages
-          if (role === 'user') {
-            const disclaimer = document.createElement('div');
-            disclaimer.className = 'message-disclaimer';
-            disclaimer.textContent = DISCLAIMER_TEXT;
-            disclaimer.setAttribute('aria-hidden', 'true');
-            row.appendChild(disclaimer);
-          }
-
           messagesContainer.appendChild(row);
           scrollToBottom();
         };
@@ -654,7 +674,10 @@
 
         // ── Event Listeners ──
 
-        inputField.addEventListener('input', updateSendBtn);
+        inputField.addEventListener('input', () => {
+          autoGrow(inputField);
+          updateSendBtn();
+        });
 
         inputField.addEventListener('keydown', (e) => {
           if (e.key === 'Enter' && !e.shiftKey) {
@@ -676,6 +699,7 @@
           const text = inputField.value.trim();
           if (!text) return;
           inputField.value = '';
+          inputField.style.height = '24px';
           updateSendBtn();
           sendMessage(text);
         });
