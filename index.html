@@ -271,7 +271,7 @@
         left: 50%;
         transform: translate(-50%, -50%);
         width: calc(100% - 24px);
-        max-width: 500px;
+        max-width: 600px;
       }
 
       .chat-widget.centered .input-container {
@@ -291,8 +291,7 @@
       /* ── Input Zone ── */
       .input-container {
         display: flex;
-        align-items: flex-end;
-        gap: 10px;
+        align-items: stretch;
         padding: 12px;
         border-top: 1px solid var(--border);
         background: var(--bg-primary);
@@ -376,10 +375,10 @@
         flex-direction: column;
         background: var(--bg-primary);
         border: 1px solid var(--border);
-        border-radius: var(--radius-md);
-        padding: 12px 14px;
+        border-radius: var(--radius-lg);
+        padding: 14px 16px 10px;
         transition: border-color 0.2s, box-shadow 0.2s;
-        min-height: 56px;
+        min-height: 80px;
       }
 
       .input-wrapper:focus-within {
@@ -397,7 +396,7 @@
         font-size: 16px;
         line-height: 1.5;
         color: var(--text-primary);
-        min-height: 24px;
+        min-height: 28px;
         max-height: 160px;
         padding: 0;
         overflow-y: auto;
@@ -408,6 +407,33 @@
       .input-field::placeholder {
         color: var(--text-secondary);
         font-size: 14px;
+      }
+
+      .input-bottom-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 8px;
+      }
+
+      .attach-btn {
+        width: 32px;
+        height: 32px;
+        border: none;
+        background: transparent;
+        color: var(--text-secondary);
+        cursor: pointer;
+        border-radius: var(--radius-sm);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.2s, color 0.2s;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      .attach-btn:hover {
+        background: var(--bg-assistant);
+        color: var(--text-primary);
       }
 
       .send-btn {
@@ -424,7 +450,6 @@
         transition: background 0.2s, transform 0.15s;
         flex-shrink: 0;
         -webkit-tap-highlight-color: transparent;
-        margin-bottom: 2px;
       }
 
       .send-btn:hover:not(:disabled) {
@@ -487,8 +512,8 @@
         }
 
         .input-wrapper {
-          padding: 10px 12px;
-          min-height: 50px;
+          padding: 10px 12px 8px;
+          min-height: 70px;
         }
 
         .input-field {
@@ -507,7 +532,7 @@
         }
 
         .input-wrapper {
-          min-height: 54px;
+          min-height: 74px;
         }
 
         .input-field {
@@ -571,19 +596,27 @@
             <textarea
               id="inputField"
               class="input-field"
-              rows="1"
+              rows="2"
               placeholder="Ask me anything about your mortgage..."
               aria-label="Message input"
               autocomplete="off"
               enterkeyhint="send"
             ></textarea>
+            <div class="input-bottom-row">
+              <button type="button" class="attach-btn" id="attachBtn" aria-label="Upload file">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+              </button>
+              <button type="submit" class="send-btn" id="sendBtn" disabled aria-label="Send message">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+              </button>
+            </div>
           </div>
-          <button type="submit" class="send-btn" id="sendBtn" disabled aria-label="Send message">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="5" y1="12" x2="19" y2="12"></line>
-              <polyline points="12 5 19 12 12 19"></polyline>
-            </svg>
-          </button>
         </form>
         <div class="input-disclaimer" aria-hidden="true">AI agents can make mistakes. Check important info. Intended for informational use.</div>
       </div>
@@ -620,7 +653,7 @@
 
         // ── Auto-grow textarea ──
         const autoGrow = (el) => {
-          el.style.height = '24px';
+          el.style.height = '44px';
           el.style.height = Math.min(el.scrollHeight, 160) + 'px';
         };
 
@@ -877,7 +910,7 @@
           const text = inputField.value.trim();
           if (!text) return;
           inputField.value = '';
-          inputField.style.height = '24px';
+          inputField.style.height = '44px';
           updateSendBtn();
           sendMessage(text);
         });
