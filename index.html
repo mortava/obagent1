@@ -70,7 +70,7 @@
       }
 
       .messages-container::-webkit-scrollbar {
-        width: 4px;
+        width: 10px;
       }
 
       .messages-container::-webkit-scrollbar-track {
@@ -78,8 +78,12 @@
       }
 
       .messages-container::-webkit-scrollbar-thumb {
-        background: var(--border);
-        border-radius: 4px;
+        background: #B0B0B0;
+        border-radius: 5px;
+      }
+
+      .messages-container::-webkit-scrollbar-thumb:hover {
+        background: #909090;
       }
 
       /* ── Welcome Message ── */
@@ -665,6 +669,14 @@
           });
         };
 
+        const scrollToElement = (element) => {
+          requestAnimationFrame(() => {
+            if (element) {
+              element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+          });
+        };
+
         const dockInput = () => {
           if (!chatStarted) {
             chatStarted = true;
@@ -762,7 +774,14 @@
 
           row.appendChild(bubble);
           messagesContainer.appendChild(row);
-          scrollToBottom();
+
+          // For user messages, scroll to bottom to show what they typed
+          // For assistant messages, scroll to top of the response so user reads from the beginning
+          if (role === 'user') {
+            scrollToBottom();
+          } else {
+            scrollToElement(row);
+          }
         };
 
         const showThinking = () => {
