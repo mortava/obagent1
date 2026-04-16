@@ -14,7 +14,8 @@ module.exports = async (req, res) => {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    const API_URL = 'https://grow.g1wins.com/api/pricing-engine/ai/chat?public=true';
+    const API_URL = process.env.CHAT_API_URL
+        || 'https://tql-broker-ai-chat-hpcz4nbaaq-uc.a.run.app/api/chat';
 
     try {
         const response = await fetch(API_URL, {
